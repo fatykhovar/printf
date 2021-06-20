@@ -8,22 +8,24 @@
 
 typedef struct s_list
 {
-	char			type;
-	int				minus;
-	int				zero;
-	int				accur;
-	struct s_list	*next;
+	int	minus;
+	int	zero;
+	int	width;
+	int	accur;
 }	t_list;
-int		proc_c(char arg);
-int		proc_s(char *arg);
+int		proc_c(char arg, t_list cur_list);
+int		proc_s(char *arg, t_list cur_list);
 void	hex_print(unsigned int arg, char reg, int *count);
-int		proc_p(unsigned int arg);
-int		proc_x(unsigned int arg, char reg);
+int		proc_p(unsigned int arg, t_list cur_list);
+int		proc_x(unsigned int arg, char reg, t_list cur_list);
 void	dec_print(int nb, int *count);
-int		proc_di(int arg);
+int		proc_di(int arg, t_list cur_list);
 void	unsign_print(int nb, int *count);
-int		proc_u(unsigned int arg);
-int		var_process(const char *str, int *count, va_list ap);
+int		proc_u(unsigned int arg, t_list cur_list);
+int		flags_accur(const char *str, int *count, t_list *cur_list, va_list ap);
+int		flags(char *str, int *count, t_list *cur_list, va_list ap);
+void	main_cycle(va_list ap, char *str, int *count);
+int		var_process(char *str, int *count, va_list ap);
 int		ft_printf(const char *str, ...);
 
 #endif
