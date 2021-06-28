@@ -1,65 +1,91 @@
 #include "ft_printf.h"
 
-void	dec_print(int nb, int *count)
+int	print_neg(int count, int arg)
 {
-	char	c;
-
-	c = nb % 10 + '0';
-	if (nb <= 0)
+	if (arg != -2147483648)
+		dec_print(-1 * arg, &count);
+	else
 	{
-		return ;
-	}
-	dec_print(nb / 10, count);
-	write(1, &c, 1);
-	(*count)++;
-}
-
-int	symb_count(int nb)
-{
-	int	count;
-
-	count = 0;
-	if (nb < 0)
-		nb = nb * (-1);
-	if (nb == 0)
-		count = 1;
-	while (nb > 0)
-	{
-		nb = nb / 10;
-		count++;
+		write(1, "2147483648", 10);
+		count += 10;
 	}
 	return (count);
 }
 
-// int	neg_print()
-// {
-
-// }
-
-// int	pos_print()
-// {
-
-// }
-
-int	max_number(int a, int b)
+int	minus_pos(int count, int symbols, int arg, t_list cur_list)
 {
-	if (a > b)
-		return (a);
+	while (count < cur_list.accur - symbols)
+		count = write_zero(count);
+	if (arg != 0)
+		dec_print(arg, &count);
+	else if (cur_list.accur != 0)
+		count = write_zero(count);
+	while (count < cur_list.width)
+		count = write_space(count);
+	return (count);
+}
+
+int	neg(int count, int symbols, int arg, t_list cur_list)
+{
+	int	max_symb_accur;
+	int	max_width_accur;
+
+	max_symb_accur = max_number(symbols, cur_list.accur);
+	max_width_accur = max_number(cur_list.width, cur_list.accur);
+	if (cur_list.zero == 1 && cur_list.accur <= 0)
+	{
+		write(1, "-", 1);
+		count++;
+		while (count < cur_list.width - max_symb_accur)
+			count = write_zero(count);
+	}
 	else
-		return (b);
+	{
+		while (count < cur_list.width - max_symb_accur - 1)
+			count = write_space(count);
+		write(1, "-", 1);
+		count++;
+		while (cur_list.accur > 0 && ((cur_list.width > cur_list.accur
+					&& count < max_width_accur - symbols)
+				|| (cur_list.width <= cur_list.accur
+					&& count < max_width_accur - symbols + 1)))
+			count = write_zero(count);
+	}
+	return (print_neg(count, arg));
+}
+
+int	pos(int count, int symbols, int arg, t_list cur_list)
+{
+	int	max_symb_accur;
+	int	max_width_accur;
+
+	max_symb_accur = max_number(symbols, cur_list.accur);
+	max_width_accur = max_number(cur_list.width, cur_list.accur);
+	//printf("%d\n", cur_list.accur);
+	if (cur_list.zero == 1 && cur_list.accur < 0)
+		while (count < cur_list.width - max_symb_accur)
+			count = write_zero(count);
+	else
+	{
+		while (count < cur_list.width - max_symb_accur)
+			count = write_space(count);
+		while (count < max_width_accur - symbols)
+			count = write_zero(count);
+	}
+	if (arg != 0)
+		dec_print(arg, &count);
+	else if (cur_list.accur != 0)
+		count = write_zero(count);
+	return (count);
 }
 
 int	proc_di(int arg, t_list cur_list)
 {
 	int	count;
 	int	symbols;
-	int	max_symb_accur;
-	int	max_width_accur;
 
 	count = 0;
-	symbols = symb_count(arg);
-	max_symb_accur = max_number(symbols, cur_list.accur);
-	max_width_accur = max_number(cur_list.width, cur_list.accur);
+	symbols = symb_count(arg, cur_list);
 	if (cur_list.minus == 1)
 	{
 		if (arg < 0)
@@ -67,90 +93,17 @@ int	proc_di(int arg, t_list cur_list)
 			write(1, "-", 1);
 			count++;
 			while (count - 1 < cur_list.accur - symbols)
-			{
-				write(1, "0", 1);
-				count++;
-			}
-			if (arg != -2147483648)
-				dec_print(-1 *arg, &count);
-			else
-			{
-				write(1, "2147483648", 11);
-				count += 11;
-			}
+				count = write_zero(count);
+			count = print_neg(count, arg);
 			while (count < cur_list.width)
-			{
-				write(1, " ", 1);
-				count++;
-			}
+				count = write_space(count);
 		}
 		else
-		{
-			while (count < cur_list.accur - symbols)
-			{
-				write(1, "0", 1);
-				count++;
-			}
-			if (arg != 0)
-				dec_print(arg, &count);
-			else
-			{
-				write(1, "0", 1);
-				count++;
-			}
-			while (count < cur_list.width)
-			{
-				write(1, " ", 1);
-				count++;
-			}
-		}
+			count = minus_pos(count, symbols, arg, cur_list);
 	}
+	else if (arg < 0)
+		count = neg(count, symbols, arg, cur_list);
 	else
-	{
-		if (arg < 0)
-		{
-			while ((count + max_symb_accur) < cur_list.width - 1)
-			{
-				write(1, " ", 1);
-				count++;
-			}
-			write(1, "-", 1);
-			count++;
-			while (count < max_width_accur - symbols + 1)
-			{
-				// printf("%i\n", max_width_accur - symbols + 1);
-				// return (0);
-				write(1, "0", 1);
-				count++;
-			}
-			if (arg != -2147483648)
-				dec_print(-1 *arg, &count);
-			else
-			{
-				write(1, "2147483648", 11);
-				count += 11;
-			}
-		}
-		else
-		{
-			while ((count + max_symb_accur) < cur_list.width)
-			{
-				write(1, " ", 1);
-				count++;
-			}
-			while (count < max_width_accur - symbols)
-			{
-				write(1, "0", 1);
-				count++;
-			}
-			if (arg != 0)
-				dec_print(arg, &count);
-			else
-			{
-				write(1, "0", 1);
-				count++;
-			}
-		}
-	}
+		count = pos(count, symbols, arg, cur_list);
 	return (count);
 }

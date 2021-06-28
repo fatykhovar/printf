@@ -1,6 +1,6 @@
 #include "ft_printf.h"
 
-int	flags_accur(const char *str, int *count, t_list *cur_list, va_list ap)
+int	flags_accur(const char *str, t_list *cur_list, va_list ap)
 {
 	int	i;
 
@@ -8,6 +8,7 @@ int	flags_accur(const char *str, int *count, t_list *cur_list, va_list ap)
 	if (str[i] == '.')
 	{
 		i++;
+		cur_list->accur = 0;
 		while (str[i] && ((str[i] >= '0' && str[i] <= '9') || str[i] == '*'))
 		{
 			if (str[i] == '*')
@@ -23,19 +24,17 @@ int	flags_accur(const char *str, int *count, t_list *cur_list, va_list ap)
 	return (i);
 }
 
-int	flags(char *str, int *count, t_list *cur_list, va_list ap)
+int	flags(char *str, t_list *cur_list, va_list ap)
 {
 	int	i;
 
 	i = 0;
-	if (str[i] == '-')
+	while (str[i] == '-' || str[i] == '0')
 	{
-		cur_list->minus = 1;
-		i++;
-	}
-	if (str[i] == '0')
-	{
-		cur_list->zero = 1;
+		if (str[i] == '-')
+			cur_list->minus = 1;
+		if (str[i] == '0' && cur_list->minus != 1)
+			cur_list->zero = 1;
 		i++;
 	}
 	while (str[i] && ((str[i] >= '0' && str[i] <= '9') || str[i] == '*'))
@@ -43,15 +42,18 @@ int	flags(char *str, int *count, t_list *cur_list, va_list ap)
 		if (str[i] == '*')
 		{
 			cur_list->width = va_arg(ap, int);
+			if (cur_list->width < 0)
+			{
+				cur_list->minus = 1;
+				cur_list->width *= -1;
+			}
 			i++;
 			break ;
 		}
 		cur_list->width = cur_list->width * 10 + (str[i] - '0');
 		i++;
 	}
-	printf("width: %d\n", cur_list->width);
-	
-	return (i += flags_accur(&str[i], count, cur_list, ap));
+	return (i += flags_accur(&str[i], cur_list, ap));
 }
 
 int	var_process(char *str, int *count, va_list ap)
@@ -59,12 +61,11 @@ int	var_process(char *str, int *count, va_list ap)
 	t_list	cur_list;
 	int		i;
 
-	cur_list.accur = 0;
+	cur_list.accur = -1;
 	cur_list.minus = 0;
 	cur_list.width = 0;
 	cur_list.zero = 0;
-	i = flags(str, count, &cur_list, ap);
-	//printf("%s\n", str);
+	i = flags(str, &cur_list, ap);
 	if (str[i] == 'c')
 		*count += proc_c(va_arg(ap, int), cur_list);
 	if (str[i] == 's')

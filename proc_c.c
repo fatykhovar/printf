@@ -7,7 +7,6 @@ int	proc_c(char arg, t_list cur_list)
 	count = 1;
 	if (cur_list.minus == 1)
 	{
-		printf("proc_c\n");
 		write(1, &arg, 1);
 		while (count <= cur_list.width)
 		{
