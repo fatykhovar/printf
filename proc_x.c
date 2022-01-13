@@ -1,12 +1,12 @@
 #include "ft_printf.h"
 
-int	hex_symb_count(unsigned int nb)
+int	hex_symb_count(size_t nb)
 {
 	int	count;
 
 	count = 0;
 	if (nb == 0)
-		count = 1;
+		return (1);
 	while (nb > 0)
 	{
 		nb = nb / 16;
@@ -15,7 +15,7 @@ int	hex_symb_count(unsigned int nb)
 	return (count);
 }
 
-void	hex_print(unsigned long long arg, char reg, int *count)
+void	hex_print(size_t arg, char reg, int *count)
 {
 	char	c;
 
@@ -53,11 +53,11 @@ int	not_minus_x(unsigned int arg, char reg, int count, t_list cur_list)
 	int	max_width_accur;
 
 	symbols = hex_symb_count(arg);
+	if (cur_list.accur == 0 && arg == 0)
+		symbols = 0;
 	max_symb_accur = max_number(symbols, cur_list.accur);
 	max_width_accur = max_number(cur_list.width, cur_list.accur);
-	if (cur_list.accur == 0)
-		max_symb_accur = 0;
-	if (cur_list.zero == 1 && cur_list.accur == -1)
+	if (cur_list.zero == 1 && cur_list.accur < 0)
 		while (count < cur_list.width - max_symb_accur)
 			count = write_zero(count);
 	else

@@ -1,7 +1,9 @@
 SRCS =		ft_printf.c proc_c.c proc_di_utils.c proc_di.c proc_p.c\
-			proc_s.c proc_u.c proc_u_utils.c proc_x.c
+			proc_s.c proc_u.c proc_x.c
 OBJS =		$(SRCS:.c=.o)
 NAME =		libftprintf.a
+HEADERS =   ft_printf.h
+INCLUDES =	./
 GCC =		gcc
 ARRC =		ar rc
 RLIB =		ranlib

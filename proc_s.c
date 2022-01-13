@@ -38,6 +38,15 @@ int	write_s(char *arg, t_list cur_list)
 	return (i);
 }
 
+int	minus_s(int count, char *arg, t_list cur_list)
+{
+	if (cur_list.accur != 0)
+		count += write_s(arg, cur_list);
+	while (count < cur_list.width)
+		count = write_space(count);
+	return (count);
+}
+
 int	proc_s(char *arg, t_list cur_list)
 {
 	int	count;
@@ -45,21 +54,17 @@ int	proc_s(char *arg, t_list cur_list)
 	int	arg_count;
 
 	count = 0;
+	if (arg == 0)
+		arg = "(null)";
 	arg_count = s_count(arg);
 	min_arg_accur = min_number(arg_count, cur_list.accur);
 	if (cur_list.accur < 0)
 		min_arg_accur = arg_count;
 	if (cur_list.minus == 1)
-	{
-		if (cur_list.accur != 0)
-			count += write_s(arg, cur_list);
-		while (count < cur_list.width)
-			count = write_space(count);
-	}
+		count = minus_s(count, arg, cur_list);
 	else
 	{
-		while (cur_list.width > arg_count
-			&& count < cur_list.width - min_arg_accur)
+		while (count < cur_list.width - min_arg_accur)
 			count = write_space(count);
 		if (cur_list.accur != 0)
 			count += write_s(arg, cur_list);

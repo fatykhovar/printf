@@ -46,9 +46,9 @@ int	not_minus_u(int count, t_list cur_list, int symbols, unsigned int arg)
 	int	max_symb_accur;
 	int	max_width_accur;
 
-	max_symb_accur = max_unsign_number(symbols, cur_list.accur);
-	max_width_accur = max_unsign_number(cur_list.width, cur_list.accur);
-	if (cur_list.zero == 1 && cur_list.accur == 0)
+	max_symb_accur = max_number(symbols, cur_list.accur);
+	max_width_accur = max_number(cur_list.width, cur_list.accur);
+	if (cur_list.zero == 1 && cur_list.accur < 0)
 		while (count < cur_list.width - max_symb_accur)
 			count = write_zero(count);
 	else
@@ -58,7 +58,8 @@ int	not_minus_u(int count, t_list cur_list, int symbols, unsigned int arg)
 		while (count < max_width_accur - symbols)
 			count = write_zero(count);
 	}
-	count = unsigned_print(count, arg);
+	if (cur_list.accur != 0 || arg != 0)
+		count = unsigned_print(count, arg);
 	return (count);
 }
 
@@ -69,17 +70,18 @@ int	proc_u(unsigned int arg, t_list cur_list)
 	int	max_symb_accur;
 	int	max_width_accur;
 
-	if (cur_list.accur == -1)
-		cur_list.accur = 0;
 	count = 0;
 	symbols = unsign_symb_count(arg);
-	max_symb_accur = max_unsign_number(symbols, cur_list.accur);
-	max_width_accur = max_unsign_number(cur_list.width, cur_list.accur);
+	max_symb_accur = max_number(symbols, cur_list.accur);
+	max_width_accur = max_number(cur_list.width, cur_list.accur);
+	if (cur_list.accur == 0 && arg == 0)
+		symbols = 0;
 	if (cur_list.minus == 1)
 	{
 		while (count < cur_list.accur - symbols)
 			count = write_zero(count);
-		count = unsigned_print(count, arg);
+		if (cur_list.accur != 0 || arg != 0)
+			count = unsigned_print(count, arg);
 		while (count < cur_list.width)
 			count = write_space(count);
 	}

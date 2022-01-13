@@ -24,12 +24,9 @@ int	flags_accur(const char *str, t_list *cur_list, va_list ap)
 	return (i);
 }
 
-int	flags(char *str, t_list *cur_list, va_list ap)
+int	flags(char *str, int i, t_list *cur_list, va_list ap)
 {
-	int	i;
-
-	i = 0;
-	while (str[i] == '-' || str[i] == '0')
+	while (str[i] && (str[i] == '-' || str[i] == '0'))
 	{
 		if (str[i] == '-')
 			cur_list->minus = 1;
@@ -65,13 +62,15 @@ int	var_process(char *str, int *count, va_list ap)
 	cur_list.minus = 0;
 	cur_list.width = 0;
 	cur_list.zero = 0;
-	i = flags(str, &cur_list, ap);
+	i = flags(str, 0, &cur_list, ap);
+	if (str[i] == '%')
+		*count += proc_c('%', cur_list);
 	if (str[i] == 'c')
 		*count += proc_c(va_arg(ap, int), cur_list);
 	if (str[i] == 's')
 		*count += proc_s(va_arg(ap, char *), cur_list);
 	if (str[i] == 'p')
-		*count += proc_p(va_arg(ap, unsigned int), cur_list);
+		*count += proc_p(va_arg(ap, size_t), cur_list);
 	if (str[i] == 'd' || str[i] == 'i')
 		*count += proc_di(va_arg(ap, int), cur_list);
 	if (str[i] == 'u')
@@ -98,14 +97,10 @@ void	main_cycle(va_list ap, char *str, int *count)
 		else
 		{
 			i++;
-			if (str[i] == '%')
-				write(1, "%", 1);
-			else
-			{
-				i += var_process(&str[i], count, ap);
-			}
+			i += var_process(&str[i], count, ap);
 		}
-		i++;
+		if (str[i] != '\0')
+			i++;
 	}
 }
 

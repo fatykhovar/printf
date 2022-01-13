@@ -32,7 +32,7 @@ int	neg(int count, int symbols, int arg, t_list cur_list)
 
 	max_symb_accur = max_number(symbols, cur_list.accur);
 	max_width_accur = max_number(cur_list.width, cur_list.accur);
-	if (cur_list.zero == 1 && cur_list.accur <= 0)
+	if (cur_list.zero == 1 && cur_list.accur < 0)
 	{
 		write(1, "-", 1);
 		count++;
@@ -61,7 +61,6 @@ int	pos(int count, int symbols, int arg, t_list cur_list)
 
 	max_symb_accur = max_number(symbols, cur_list.accur);
 	max_width_accur = max_number(cur_list.width, cur_list.accur);
-	//printf("%d\n", cur_list.accur);
 	if (cur_list.zero == 1 && cur_list.accur < 0)
 		while (count < cur_list.width - max_symb_accur)
 			count = write_zero(count);
